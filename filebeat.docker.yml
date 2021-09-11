@@ -1,0 +1,28 @@
+logging.level: info
+
+# Note: I use version to indicate the schema of .data
+#   In this very simple case, it's fine, but when additional fields grow
+#   or change over time having the version field helps later in the pipeline
+fields:
+  version: v1
+  data:
+    cluster: local
+
+filebeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml
+    reload.enabled: false
+
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+
+output.kafka:
+  hosts: ["localhost:9092"]
+  topic: "filebeat"
+  partition.round_robin:
+    reachable_only: false
+  required_acks: 1
+  compression: gzip
+  max_message_bytes: 1000000
